@@ -12,3 +12,4 @@ int main()
 }
 
 couit<<hhh
+cout<<ee
