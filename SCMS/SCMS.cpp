@@ -143,3 +143,146 @@ private:
 	//member 2
 
 
+
+
+
+
+
+	//member 1
+	class LibraryItem {
+	private:
+		string itemID, title, author;
+		int publicationYear;
+	public:
+		LibraryItem(string id, string t, string a, int year) : itemID(id), title(t), author(a), publicationYear(year) {}
+		virtual ~LibraryItem() {}
+		virtual void displayInfo() = 0;
+		string getItemID() { return itemID; }
+		string getTitle() { return title; }
+		string getAuthor() { return author; }
+		int getPublicationYear() { return publicationYear; }
+	};
+	class Book :public LibraryItem {
+	private:
+		string ISBN, genre;
+		int copiesAvailable;
+	public:
+		Book(string id, string t, string a, int year, string isbn, string g, int copies)
+			:LibraryItem(id, t, a, year), ISBN(isbn), genre(g), copiesAvailable(copies) {
+		}
+		void displayInfo() {
+			cout << "Book: " << getTitle() << " | Author: " << getAuthor() << " | Year: " << getPublicationYear() << " | ISBN: " << ISBN << " | Genre: " << genre << " | Copies Available: " << copiesAvailable << endl;
+		}
+		string getISBN() { return ISBN; }
+		string getGenre() { return genre; }
+		int getCopiesAvailable() { return copiesAvailable; }
+		 setCopiesAvailable(int copies) { copiesAvailable = copies; }
+		 void checkOut() {
+			 if (copiesAvailable > 0) {
+				 copiesAvailable--;
+			 }
+			 else {
+				 throw capacityExceeded();
+			 }
+		 
+		 }
+		 void returnItem() {
+			 copiesAvailable++;
+		 }
+	};
+	class Journal :public LibraryItem {
+	private:
+		string ISSN;
+		int volume, issueNo;
+		public
+			Journal(string id, string t, string a, int year, string issn, int vol, int issue)
+			:LibraryItem(id, t, a, year), ISSN(issn), volume(vol), issueNo(issue) {
+		}
+		void displayInfo() {
+			cout << "Journal: " << getTitle() << " | Author: " << getAuthor() << " | Year: " << getPublicationYear() << " | ISSN: " << ISSN << " | Volume: " << volume << " | Issue No: " << issueNo << endl;
+		}
+		string getISSN() { return ISSN; }
+		int getVolume() { return volume; }
+		int getIssueNo() { return issueNo; }
+		
+	};
+	struct issueItem {
+		int rollNo;
+		string itemID;
+	};
+	class Library{
+	private:
+		LibraryItem* catalog[10];
+		int itemCount;
+		issueItem issuedItems[15];
+		int issuedCount;
+	public:
+		Library() : itemCount(0), issuedCount(0) {}
+
+		~Library() {
+			for (int i = 0;i < itemCount;i++) {
+				delete catalog[i];
+			}
+		}
+		void addItem(LibraryItem* item) {
+			if (itemCount < 20) {
+				catalog[itemCount] = item;
+				itemCount++;
+			}
+		}
+		void searchByTitle(string title) {
+			for (int i = 0;i < itemCount;i++) {
+				if (catalog[i]->getTitle() == title) {
+					catalog[i]->displayInfo();
+					return;
+				}
+			}
+			cout << "Item not found." << endl;
+		}
+		void saveTofile(string filename) {
+			ofstream outFile(filename);
+			if (outFile.is_open()) {
+				for (int i = 0;i < itemCount;i++) {
+					outFile << catalog[i]->getItemID() << "," << catalog[i]->getTitle() << "," << catalog[i]->getAuthor() << "," << catalog[i]->getPublicationYear() << endl;
+				}
+				outFile.close();
+			}
+		}
+
+		void loadFromFile(string filename) {
+			ifstream inFile(filename);
+			if (inFile.is_open()) {
+				string line;
+				while (getline(inFile, line)) {
+					// Parse line and create LibraryItem objects
+				}
+				inFile.close();
+			}
+		}
+		void issueItemToStudent(int rollNo, string itemID) {
+			for (int i = 0;i < itemCount;i++) {
+				if (catalog[i]->getItemID() == itemID) {
+					try {
+						catalog[i]->checkOut();
+						issuedItems[issuedCount++] = { rollNo, itemID };
+						cout << "Item issued successfully." << endl;
+						return;
+					}
+					catch (capacityExceeded& e) {
+						cout << e.what() << endl;
+						return;
+					}
+				}
+			}
+			cout << "Item not found." << endl;
+		}
+		void displayIssuedItems() {
+			for (int i = 0;i < issuedCount;i++) {
+				cout << "Roll No: " << issuedItems[i].rollNo << " | Item ID: " << issuedItems[i].itemID << endl;
+			}
+		}
+	};
+
+
+
+
