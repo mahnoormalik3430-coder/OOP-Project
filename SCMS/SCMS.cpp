@@ -284,5 +284,128 @@ private:
 	};
 
 
+	//member 2
+
+
+
+
+
+	//member 1
+
+	class Accomodation {
+	public:
+		virtual void allocateRoom(int rollNo) = 0;
+		virtual void vacateRoom(int roomNo) = 0;
+	};
+	class Reportable {
+	public:
+		virtual void generateReport() = 0;
+	};
+	class Room {
+	private:
+		int roomNo, floor;
+		string type;
+		int occupants[4];
+		int occupantCount;
+	public:
+		Room(int rNo, int f, string t) : roomNo(rNo), floor(f), type(t), occupantCount(0) {
+			for (int i = 0;i < 4;i++) {
+				occupants[i] = -1; 
+			}
+		}
+		void addOccupant(int rollNo) {
+			if (occupantCount < 4) {
+				occupants[occupantCount++] = rollNo;
+			}
+			else {
+				throw capacityExceeded();
+			}
+		}
+		void removeOccupant(int rollNo) {
+			for (int i = 0;i < occupantCount;i++) {
+				if (occupants[i] == rollNo) {
+					for (int j = i;j < occupantCount - 1;j++) {
+						occupants[j] = occupants[j + 1];
+					}
+					occupantCount--;
+					return;
+				}
+			}
+		}
+		void displayInfo() {
+			cout << "Room No: " << roomNo << " | Floor: " << floor << " | Type: " << type << " | Occupants: ";
+			for (int i = 0;i < occupantCount;i++) {
+				cout << occupants[i] << " ";
+			}
+			cout << endl;
+		}
+		class Hostel:
+	private:
+		string blockName;
+		Room* rooms[10];
+		int roomCount;
+	public:
+		Hostel(string name) : blockName(name), roomCount(0) {}
+		void addRoom(Room* room) {
+			if (roomCount < 10) {
+				rooms[roomCount++] = room;
+			}
+		}
+		void allocateRoom(int rollNo) {
+			for (int i = 0;i < roomCount;i++) {
+				try {
+					rooms[i]->addOccupant(rollNo);
+					cout << "Room allocated successfully." << endl;
+					return;
+				}
+				catch (capacityExceeded& e) {
+					continue;
+				}
+			}
+			cout << "No available rooms." << endl;
+		}
+		void vacateRoom(int roomNo) {
+			for (int i = 0;i < roomCount;i++) {
+				if (rooms[i]->getRoomNo() == roomNo) {
+					rooms[i]->removeOccupant(rollNo);
+					cout << "Room vacated successfully." << endl;
+					return;
+				}
+			}
+			cout << "Room not found." << endl;
+		}
+		void displayRooms() {
+			for (int i = 0;i < roomCount;i++) {
+				rooms[i]->displayInfo();
+			}
+		}
+		class HostelManager :public Accomodation, public Reportable {
+		private:
+			HostelBlock* blocks[3];
+			int blockCount;
+		public:
+			HostelManager() : blockCount(0) {}
+			void addBlock(HostelBlock* block) {
+				if (blockCount < 3) {
+					blocks[blockCount++] = block;
+				}
+			}
+			void allocateRoom(int rollNo) {
+				for (int i = 0;i < blockCount;i++) {
+					blocks[i]->allocateRoom(rollNo);
+				}
+			}
+			void vacateRoom(int roomNo) {
+				for (int i = 0;i < blockCount;i++) {
+					blocks[i]->vacateRoom(roomNo);
+				}
+			}
+			void generateReport() {
+				for (int i = 0;i < blockCount;i++) {
+					blocks[i]->displayRooms();
+				}
+			}
+		};
+
 
 
